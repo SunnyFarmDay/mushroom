@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/MonthSalaries.css' %}">
+{% endblock %}
+{% block additional_buttons %}
+<div>
+    <button id="salary-edit" class="btn btn-outline-secondary" a="">Edit</button>
+    <a id="salary-add" class="btn btn-success" href="{% url 'SalaryInput:salary_input' %}">Add New Record</a>
+    <button id="salary-save" class="btn btn-success d-none" a="">Save</button>
+    <button id="salary-cancel" class="btn btn-outline-danger d-none" a="">Cancel</button>
+</div>
+
+{% endblock %}
+{% block body %}
+<div class="container p-3">
+    {% for pay in month_salaries %}
+    <div class="row g-3 h-100">
+        <div class="col-md-4 col-5">
+            <div class=" input-group h-100 pb-3">
+                <span class="input-group-text">{{ pay.0 }}</span>
+                <span class="input-group-text form-control pay_name">{{ pay.1 }}</span>
+            </div>
+        </div>
+        
+        <div class="col-md-8 col-7" id="{{ pay.0 }}">
+            <div class="input-group mb-3">
+                <input type="number" class="form-control" value="{{ pay.2 }}" aria-label="amount" aria-describedby="amount" readonly>
+                <textarea type="text" class="form-control textarea" placeholder="*description" value="{{ pay.3 }}" aria-label="description" aria-describedby="description"></textarea>
+            </div>
+    
+        </div>
+    </div>
+    
+    {% endfor %}
+</div>
+{% endblock %}

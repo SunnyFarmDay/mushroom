@@ -1,6 +1,89 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/SalaryInput.css'%}">
+{% endblock%}
 {% block body%}
 <div class="container p-3">
-    <h1>Hello World!</h1>
+    <form action="" method="get">
+        <div class="mb-3 row">
+            <label for="input_month" class="col-sm-4 col-form-label">Select Month</label>
+            <div class="col-sm-8">
+                <input type="number" name="month" class="form-control text-end" id="input_month" value="{{ month }}">
+            </div>
+        </div>
+    </form>
+    
+    <hr>
+
+    <form id="salary-forms" method="post">
+    {% csrf_token %}
+    {{ forms.management_form }}
+    
+    {% for thisform in forms%}
+        {% for hidden in thisform.hidden_fields %}
+        {{ hidden }}
+        {% endfor %}
+        <div class="salary-form row g-3 h-100">
+            <div class="col-md-3 col-3">
+                <div class=" input-group h-100 pb-3">
+                    {{ thisform.SID_or_name }}
+                </div>
+            </div>
+            
+            <div class="col-md-8 col-7">
+                <div class="input-group mb-3">
+                    {{ thisform.amount }}
+                    {{ thisform.description}}
+                    
+                </div>
+            </div>
+            <div class="col-md-1 col-2">
+                <div class=" input-group h-100 pb-3">
+                    {{ thisform.pay_status}}
+                </div>
+            </div>
+        </div>
+        {{ thisform.errors }}
+    {% endfor %}
+        <button type="button" id="add-form" class="btn btn-outline-success" name="add-form">Add Form</button>
+        <button type="button" id="remove-form" class="btn btn-outline-danger" name="remove-form">Remove Form</button>
+        <button id="formset-submit" class="btn btn-success" name="formset">Submit</button>
+    </form>
 </div>
+{% endblock %}
+{% block script %}
+<script>
+    let salary_forms = document.querySelectorAll(".salary-form")
+    let form_container = document.querySelector("#salary-forms")
+    let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
+    let addbutton = document.querySelector('#add-form')
+    let removebutton = document.querySelector('#remove-form')
+    addbutton.addEventListener('click', addForm)
+    removebutton.addEventListener('click', removeForm)
+    let formNum = salary_forms.length - 1
+    
+
+    function addForm(e){
+        e.preventDefault()
+        let newForm = salary_forms[0].cloneNode(true)
+        newForm.querySelector('.amount_field').setAttribute('value', '')
+        let formRegex = RegExp('form-(\\d){1}-','g')
+        formNum++
+        newForm.innerHTML =newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
+        form_container.insertBefore(newForm, addbutton)
+        totalForms.setAttribute('value', formNum+1)
+        salary_forms = document.querySelectorAll(".salary-form")
+    }
+    function removeForm(e){
+        if (formNum != 0) {
+            e.preventDefault()
+            formNum--
+            salary_forms[salary_forms.length - 1].remove()
+            totalForms.setAttribute('value', formNum+1)
+            salary_forms = document.querySelectorAll(".salary-form")
+        }
+       
+    }
+</script>
 {% endblock %}

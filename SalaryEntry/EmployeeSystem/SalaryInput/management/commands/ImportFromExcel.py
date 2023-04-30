@@ -29,6 +29,9 @@ class Command(BaseCommand):
                         continue
                     employee = (Employee.objects.update_or_create(SID=int(row["SID"]), chi_name=row["chi_name"], eng_name=row["eng_name"]))[0]
                     if (not pd.isnull(row["salary"])):
-                        Salary.objects.update_or_create(month = atr[1][2:], employee=employee, amount=row["salary"], pay_status = row["pay_status"])
-            
-        
+                        month = atr[1]
+                        pid = str(employee.SID) + '_' + month
+                        if (pd.isna(row['pay_status'])):
+                            Salary.objects.update_or_create(pid=pid, month = month, employee=employee, amount=row["salary"], pay_status = 'N')
+                        else:
+                            Salary.objects.update_or_create(pid=pid, month = month, employee=employee, amount=row["salary"], pay_status = row["pay_status"])
