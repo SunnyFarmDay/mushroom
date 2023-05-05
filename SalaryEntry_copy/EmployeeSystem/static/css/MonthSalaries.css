@@ -1,0 +1,11 @@
+.pay_name {
+    overflow-x: auto;
+}
+
+.pay_amount {
+    width: 3rem !important;
+}
+
+.textarea {
+    height: 2rem;
+}
