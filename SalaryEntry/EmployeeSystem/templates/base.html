@@ -23,7 +23,7 @@
                     <ul class="navbar-nav mx-5" style="overflow-x: auto;">
                         <!-- <li class="nav-item"><a class="nav-link" href="#">Hyperlink</a></li> -->
                         {% for month in salary_months %}
-                        <li class="nav-item"><a class="nav-link" href="/salary/month/{{ month }}">{{ month }}</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/salary/month/{{ month }}/A">{{ month }}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -41,7 +41,11 @@
 {% block body %}
     <h1>Hello World!</h1>
 {% endblock %}
+
     <script src="{% static 'bootstrap/js/bootstrap.bundle.js' %}"></script>
+    <script src="{% static 'jquery/jquery-3.6.4.min.js' %}"></script>
+    <link href="https://cdn.datatables.net/v/bs5/dt-1.13.4/datatables.min.css" rel="stylesheet"/>
+    <script src="https://cdn.datatables.net/v/bs5/dt-1.13.4/datatables.min.js"></script>
     {% block script %}
     {% endblock %}
 </body>

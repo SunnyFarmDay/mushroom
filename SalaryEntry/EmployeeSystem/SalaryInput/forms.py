@@ -1,37 +1,34 @@
 from django import forms
-from .models import Employee, Class
-class SalaryRecordForm(forms.Form):
-    pay_status_choices = (
-        ('N', 'N'),
-        ('M', 'M'),
-        ('P', 'P'),
-    )
-    SID_or_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'placeholder': 'SID or Name', 'class': "form-control SID_field", 'list': 'Employee_names_list','aria-label':"SID_or_name", 'aria-describedby':"SID_or_name"}))
-    amount = forms.DecimalField(max_digits=10, decimal_places=2, widget=forms.TextInput(attrs={'class': "form-control amount_field"}))
-    description = forms.CharField(max_length=3000, required=False,widget=forms.Textarea(attrs={'class': "form-control textarea description_field", 'placeholder': "*description"}))
-    pay_status = forms.ChoiceField(choices = pay_status_choices, widget=forms.Select(attrs={'class': "form-control pay_status_field"}))
+from .models import Employee, Class, Salary
+from datetime import datetime
+from django.utils import timezone
+
+thismonth = str(int(datetime.now().strftime("%Y%m")[2:]) - 1)
+class EmployeeSalarySelectionForm(forms.Form):
+
+    month = forms.IntegerField(widget=forms.NumberInput(attrs={'placeholder': 'YYMM', 'class': "form-control text-end"}))
+    SID_or_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'placeholder': 'SID or Name', 'class': "form-control text-end", 'list': 'Employee_names_list','aria-label':"SID_or_name", 'aria-describedby':"SID_or_name"}))
     employee = forms.ModelChoiceField(Employee.objects.all(), required=False)
     new_employee = forms.BooleanField(required=False, initial=False)
-    
 
     def clean(self):
         cleaned = super().clean()
+        errors = []
         SID_or_name = cleaned.get("SID_or_name")
         if (not SID_or_name):
             raise forms.ValidationError("SID_or_name cannot be blank")
         if str(SID_or_name).isnumeric():
             SID = int(SID_or_name)
             if len(str(SID_or_name)) != 4:
-                raise forms.ValidationError("SID should be 4 digits")
+                errors.append(forms.ValidationError("SID should be 4 digits"))
             else:
                 try:
                     employee = Employee.objects.get(SID=SID)
-                except Employee.DoesNotExist:
-                    raise forms.ValidationError("SID does not match")
-                except:
-                    raise forms.ValidationError("Unknown Error01")
-                if (employee):
                     cleaned['employee']=employee
+                except Employee.DoesNotExist:
+                    errors.append(forms.ValidationError("SID does not match"))
+                except:
+                    errors.append(forms.ValidationError("Unknown Error01"))
         else:
             name = str(SID_or_name)
             print(name)
@@ -46,6 +43,7 @@ class SalaryRecordForm(forms.Form):
                     employee = Employee.objects.get(chi_name = name)
                 else:
                     employee = Employee.objects.get(eng_name = name)
+                cleaned['employee'] = employee
             except Employee.DoesNotExist:
                 SID = Employee.objects.values("SID").order_by("SID").last()
                 if SID:
@@ -53,12 +51,115 @@ class SalaryRecordForm(forms.Form):
                     SID = SID + 1
                     employee = Employee.objects.create(SID=SID, chi_name = chi_name, eng_name = eng_name)
                     cleaned['new_employee']=True
-                else: raise forms.ValidationError("Unknown Error 02")
+                    cleaned['employee'] = employee
+                else: 
+                    errors.append(forms.ValidationError("Unknown Error 02"))
             except:
-                raise forms.ValidationError("Unknown Error 03")
-            cleaned['employee'] = employee
+                errors.append(forms.ValidationError("Unknown Error 03"))
+        if len(str(cleaned['month'])) != 4:
+            errors.append(forms.ValidationError("Month should be in format of YYMM"))
+        month = int(str(cleaned['month'])[2:])
+        if month < 0 or month > 12:
+            errors.append(forms.ValidationError("Month should within 0 to 12"))
+        if errors:
+            raise forms.ValidationError(errors)
+        
         return cleaned
 
+
+
+# class SalaryRecordForm(forms.Form):
+#     pay_status_choices = (
+#         ('N', 'N'),
+#         ('M', 'M'),
+#         ('P', 'P'),
+#     )
+#     SID_or_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'placeholder': 'SID or Name', 'class': "form-control SID_field", 'list': 'Employee_names_list','aria-label':"SID_or_name", 'aria-describedby':"SID_or_name"}))
+#     amount = forms.DecimalField(max_digits=10, decimal_places=2, widget=forms.TextInput(attrs={'class': "form-control amount_field"}))
+#     description = forms.CharField(max_length=3000, required=False,widget=forms.Textarea(attrs={'class': "form-control textarea description_field", 'placeholder': "*description"}))
+#     pay_status = forms.ChoiceField(choices = pay_status_choices, widget=forms.Select(attrs={'class': "form-control pay_status_field"}))
+#     employee = forms.ModelChoiceField(Employee.objects.all(), required=False)
+#     new_employee = forms.BooleanField(required=False, initial=False)
+    
+
+#     def clean(self):
+#         cleaned = super().clean()
+#         SID_or_name = cleaned.get("SID_or_name")
+#         if (not SID_or_name):
+#             raise forms.ValidationError("SID_or_name cannot be blank")
+#         if str(SID_or_name).isnumeric():
+#             SID = int(SID_or_name)
+#             if len(str(SID_or_name)) != 4:
+#                 raise forms.ValidationError("SID should be 4 digits")
+#             else:
+#                 try:
+#                     employee = Employee.objects.get(SID=SID)
+#                 except Employee.DoesNotExist:
+#                     raise forms.ValidationError("SID does not match")
+#                 except:
+#                     raise forms.ValidationError("Unknown Error01")
+#                 if (employee):
+#                     cleaned['employee']=employee
+#         else:
+#             name = str(SID_or_name)
+#             print(name)
+#             if len(SID_or_name) < 4:
+#                 chi_name = name
+#                 eng_name = ''
+#             else:
+#                 chi_name = ''
+#                 eng_name = name
+#             try:
+#                 if chi_name:
+#                     employee = Employee.objects.get(chi_name = name)
+#                 else:
+#                     employee = Employee.objects.get(eng_name = name)
+#             except Employee.DoesNotExist:
+#                 SID = Employee.objects.values("SID").order_by("SID").last()
+#                 if SID:
+#                     SID = SID['SID']
+#                     SID = SID + 1
+#                     employee = Employee.objects.create(SID=SID, chi_name = chi_name, eng_name = eng_name)
+#                     cleaned['new_employee']=True
+#                 else: raise forms.ValidationError("Unknown Error 02")
+#             except:
+#                 raise forms.ValidationError("Unknown Error 03")
+#             cleaned['employee'] = employee
+#         return cleaned
+
+class SalaryRecordForm(forms.Form):
+    pay_status_list = (
+        ('N', 'N'),
+        ('M', 'M'),
+        ('P', 'P'),
+    )
+    amount = forms.DecimalField(max_digits=10, decimal_places=2, widget=forms.TextInput(attrs={'required': '', 'class': "form-control border-0 record_amount_field", 'placeholder': "Amount?", 'autofocus':'', 'onfocus':"this.select()"}))
+    weight = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': "form-control border-0 record_weight_field", 'placeholder': "X duration"}))
+    description = forms.CharField(max_length=3000, required=False,widget=forms.Textarea(attrs={'class': "form-control border-0 textarea description_field", 'placeholder': "Desc?"}))
+    pay_status = forms.CharField(max_length=10, widget=forms.TextInput(attrs={'class': "form-control border-0 pay_status_field", 'list': 'pay_status_list'}))
+    
+    def clean(self):
+        cleaned = super().clean()
+        weight = cleaned['weight']
+        weight = weight.replace('_', '+')
+        amount = cleaned['amount']
+        if weight:
+            try:
+                weights = str(weight).split('+')
+                print(weights)
+                total = 0
+                for thisweight in weights:
+                    total = total + float(thisweight)
+                print(total, float(amount))
+                cleaned['weight'] = ''
+                totalamount = round((total * float(amount)), 2)
+                cleaned['amount'] = totalamount
+                print(round((total * float(amount)), 2))
+                cleaned['description'] = f"{cleaned['description']}\n ({weight})={str(total)}\n*{amount}={totalamount}"
+            except Exception as e:
+                raise forms.ValidationError(f'{e}, Weight is incorrectly input.')
+        return cleaned
+    
 class CreateClassForm(forms.ModelForm):
     class Meta:
         model = Class
@@ -85,3 +186,64 @@ class CreateClassForm(forms.ModelForm):
         else:
             if str(cleaned['level'][0]).islower() or str(cleaned['level'][1]).isupper():
                 raise forms.ValidationError("level should be correctly capitalized")
+
+def countSalary(month, status = 'A'):
+    month_salaries = Salary.objects.filter(month = month).values()
+    if status != 'A':
+        month_salaries = month_salaries.filter(pay_status = status).values()
+    salaries = []
+    count = 0
+    for employee in Employee.objects.all():
+        pay = month_salaries.filter(employee_id = employee.SID).values('amount', 'description')
+        if (pay):
+            count = count + 1
+        #     salaries[employee.SID] = [name, pay[0]['PID'], pay[0]['PID'], pay[0]['PID']]
+        # else:
+        #     salaries[employee.SID] = [name, '', '', '']
+    return count
+
+CHEQUE_TYPE = ('BOC', 'HSBC')
+class PrintRecordFrom(forms.Form):
+    month = forms.IntegerField(widget=forms.NumberInput(attrs={'placeholder': 'YYMM', 'class': "form-control text-end", 'readonly': ''}))
+    cheque_available = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control textarea', 'placeholder': 'ChequeType-startnum-endnum\\n'}))
+    change_to_printed = forms.BooleanField(initial=(False), required=False)
+    print_time = forms.DateField(widget=forms.DateInput(attrs={'class':'form-control'}), required=False)
+
+    def clean(self):
+        cleaned = super().clean()
+        cheque_available = cleaned['cheque_available']
+        cleaned['print_time'] = timezone.now().date()
+        cheque_list = cheque_available.split('\r')
+        month = cleaned['month']
+        errors = []
+        total_cheque = 0
+        for details in cheque_list:
+            details = details.strip()
+            print(details)
+            details = details.split('-')
+            if details[0] not in CHEQUE_TYPE:
+                errors.append(forms.ValidationError(f'Cheque type must be {CHEQUE_TYPE}'))
+            else:
+                if len(details) != 3:
+                    errors.append(forms.ValidationError(f'Cheque format is wrong'))
+                else:
+                    if len(details[1]) != 6 or len(details[2]) != 6:
+                        print(details)
+                        errors.append(forms.ValidationError(f'Cheque number format error!'))
+                    else:
+                        total_cheque = total_cheque + (int(details[2]) - int(details[1])) + 1
+        if len(str(cleaned['month'])) != 4:
+            errors.append(forms.ValidationError("Month should be in format of YYMM"))
+        else:
+            tomonth = int(str(cleaned['month'])[2:])
+            if tomonth < 0 or tomonth > 12:
+                errors.append(forms.ValidationError("Month should within 0 to 12"))
+            else:
+                if total_cheque:
+                    cheque_needed = countSalary(month, 'N')
+                    if cheque_needed != total_cheque:
+                        errors.append(forms.ValidationError(f"total cheque vailable ({total_cheque}) != total cheque needed ({cheque_needed})"))
+        if errors:
+            raise forms.ValidationError(errors)
+        return cleaned
+

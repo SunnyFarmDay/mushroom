@@ -64,10 +64,10 @@
             {% csrf_token %}
             <h1>Class list:</h1>
             <div class="container-fluid my-3 p-0">
-                <button type="button" class="btn btn-outline-primary m-0" href="{% url 'SalaryInput:export_classes_csv' %} " data-bs-toggle="modal" data-bs-target="#confirm_download_classes_csv">Export Classes as .csv</a>
+                <button type="button" class="btn btn-outline-primary m-0" data-bs-toggle="modal" data-bs-target="#confirm_download_classes_csv">Export Classes as .csv</a>
             </div>
             <div class="modal fade" id="confirm_download_classes_csv" tabindex="-1" aria-labelledby="confirm_download_classes_csv" aria-hidden="true">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-dialog-centered">
                   <div class="modal-content">
                     <div class="modal-body">
                       <p>You sure to download Classes entry?</p>

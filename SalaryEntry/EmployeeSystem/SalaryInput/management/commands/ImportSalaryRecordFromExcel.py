@@ -13,10 +13,11 @@ class Command(BaseCommand):
         excel = pd.ExcelFile(file_location)
         for cursheet in excel.sheet_names:
             cursheet = str(cursheet)
-            atr = cursheet.split('_')
-            if atr[0] == "salary" and len(atr) == 2:
+            atr = cursheet.split(' ')
+            if atr[0] == "Salary" and len(atr) == 2:
                 print(f"-- current sheet is {cursheet}\n")
                 df = excel.parse(cursheet)
+                print(df)
                 df.fillna('')
                 df = df.set_axis(["SID", "chi_name", "salary", "pay_status"], axis='columns')
                 df.insert(2, "eng_name", '')
