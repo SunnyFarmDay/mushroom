@@ -77,8 +77,21 @@ def monthSalary(request, month, status):
                 context['print_record_form'] = PrintRecordFrom(request.POST)
                 context['record_form_open']='True'
                 print('error')
+        elif action[0] == 'edit':
+            PID = action[1]
+            try:
+                cheque = validateAndFormatChequeNumber(input)
+            except Exception as e:
+                messages.error(request, str(e))
+            
     return render(request, 'MonthSalaries.html', context)
-
+def validateAndFormatChequeNumber(input):
+    input = input.split('-')
+    if len(input) != 2:
+        return ValueError("Cheque format is incorrect (BOC-123456)")
+    if len(input[1]) !=6:
+        return ValueError("Cheque format is incorrect (BOC-123456)")
+    return input
 def getMonthSalary(month, status, description = True, merged=True):
     month_salaries = Salary.objects.filter(month = month).values()
     if status != 'A':

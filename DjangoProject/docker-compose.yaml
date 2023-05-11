@@ -9,14 +9,14 @@ services:
     build:
       context: .
     ports:
-      - "8000:8000"
+      - "8098:8098"
   nginx:
     build:
       ./nginx
     volumes:
       - static:/static
     ports:
-      - "80:80"
+      - "8099:8099"
     depends_on:
       - django_gunicorn
     
