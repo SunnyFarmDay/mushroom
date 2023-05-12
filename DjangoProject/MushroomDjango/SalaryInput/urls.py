@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 
 app_name = "SalaryInput"
 urlpatterns = [
-    path('home/', views.home),
+    path('home/', views.home, name='home'),
     path('salary/month/<str:month>/<str:status>', views.monthSalary, name='monthly_salary'),
     path('salary_input/', views.salaryInput, name="salary_input"),
     path('salary_input/<int:SID>/<int:month>', views.employeeSalaryInput, name="employee_salary_input"),
