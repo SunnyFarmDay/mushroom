@@ -71,7 +71,7 @@ Size = {
     'HSBC': [15.9, 8.3],
     'Wage Sheet': [19.2, 10.5]
 }
-pdfmetrics.registerFont(TTFont('TimesNewRoman', '/home/sunny/mushroom/ChequePrint/times.ttf'))
+pdfmetrics.registerFont(TTFont('TimesNewRoman', './times.ttf'))
 
 
 
