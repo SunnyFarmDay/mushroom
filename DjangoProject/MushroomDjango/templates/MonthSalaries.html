@@ -15,8 +15,12 @@
 {% block body %}
 <div class="container p-3">
     <div class="container-fluid my-3 p-0">
-        <a class="btn btn-outline-primary m-0" href="{% url 'SalaryInput:monthly_salary' month 'A' %}">No Filter</a>
-        <a class="btn btn-outline-primary m-0" href="{% url 'SalaryInput:monthly_salary' month 'N' %}">Only non-printed</a>
+        <a class="btn btn-outline-primary m-0" href="{% url 'SalaryInput:monthly_salary' month 'All' %}">No Filter</a>
+        <a class="btn btn-outline-primary m-0" href="{% url 'SalaryInput:monthly_salary' month 'Empty' %}">No Salary Inputted</a>
+        <p class="d-inline mx-3 align-middle">Filter by Pay Status:</p>
+        {% for status in pay_status_list %}
+        <a class="btn btn-outline-primary m-0" href="{% url 'SalaryInput:monthly_salary' month status %}">{{ status }}</a>
+        {% endfor %}
     </div>
     <div class="container-fluid my-3 mb-5 p-0">
         <a class="btn btn-outline-primary m-0" href="{% url 'SalaryInput:export_monthly_salary_csv' month 'A' %}">Export All Salary as .csv</a>

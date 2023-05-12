@@ -23,16 +23,13 @@
                     <ul class="navbar-nav mx-5" style="overflow-x: auto;">
                         <!-- <li class="nav-item"><a class="nav-link" href="#">Hyperlink</a></li> -->
                         {% for month in salary_months %}
-                        <li class="nav-item"><a class="nav-link" href="/salary/month/{{ month }}/A">{{ month }}</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'SalaryInput:monthly_salary' month 'All' %}">{{ month }}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
                 
             </div>
             {% block additional_buttons %}
-            <div>
-                <a class="btn btn-success" href="{% url 'SalaryInput:salary_input' %}">Add Salary</a>
-            </div>
             {% endblock %}
         </div>
         

@@ -2,8 +2,30 @@ from django import forms
 from .models import Employee, Class, Salary
 from datetime import datetime
 from django.utils import timezone
-
+from .const import *
 thismonth = str(int(datetime.now().strftime("%Y%m")[2:]) - 1)
+
+def validateAndFormatChequeNumber(input):
+    input = input.split('-')
+    if len(input) != 2:
+        raise ValueError("Cheque format is incorrect (e.g. BOC-123456)")
+    if len(input[1]) !=6:
+        raise ValueError("Cheque format is incorrect (e.g. BOC-123456)")
+    return input
+
+def validateChequeNumberAndPayStatus(cheque, status):
+    if cheque:
+        cheque = validateAndFormatChequeNumber(cheque)
+    if status not in PAY_STATUS_LIST:
+        raise ValueError(f'Pay Status can only be {PAY_STATUS_LIST}!')
+    if status == 'P':
+        if not cheque:
+            raise SyntaxError("Pay status is P while having no cheque number!")
+    else:
+        if cheque:
+            raise ValueError("Please update Pay Status to P if you already have cheque number!")
+    return cheque
+
 class EmployeeSalarySelectionForm(forms.Form):
 
     month = forms.IntegerField(widget=forms.NumberInput(attrs={'placeholder': 'YYMM', 'class': "form-control text-end"}))
@@ -137,6 +159,7 @@ class SalaryRecordForm(forms.Form):
     weight = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': "form-control border-0 record_weight_field", 'placeholder': "X duration"}))
     description = forms.CharField(max_length=3000, required=False,widget=forms.Textarea(attrs={'class': "form-control border-0 textarea description_field", 'placeholder': "Desc?"}))
     pay_status = forms.CharField(max_length=10, widget=forms.TextInput(attrs={'class': "form-control border-0 pay_status_field", 'list': 'pay_status_list'}))
+    cheque_number = forms.CharField(max_length=15, required=False, widget=forms.TextInput(attrs={'class': "form-control border-0 cheque_number_field", 'placeholder': 'Cheque Number?'}))
     
     def clean(self):
         cleaned = super().clean()
@@ -158,6 +181,10 @@ class SalaryRecordForm(forms.Form):
                 cleaned['description'] = f"{cleaned['description']}\n ({weight})={str(total)}\n*{amount}={totalamount}"
             except Exception as e:
                 raise forms.ValidationError(f'{e}, Weight is incorrectly input.')
+        try:
+            validateChequeNumberAndPayStatus(cleaned['cheque_number'], cleaned['pay_status'])
+        except Exception as e:
+            raise forms.ValidationError(e)
         return cleaned
     
 class CreateClassForm(forms.ModelForm):

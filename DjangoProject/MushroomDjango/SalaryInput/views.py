@@ -4,15 +4,15 @@ from .forms import SalaryRecordForm, CreateClassForm, EmployeeSalarySelectionFor
 from datetime import datetime
 from django.forms import formset_factory
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import pandas as pd
 import numpy as np
 from .print import print_record
+from .const import *
 # Create your views here.
 
 #Get namelist
-def getEmployeesName():
-    Employees = Employee.objects.all()
+def getEmployeesName(Employees = Employee.objects.all()):
     names = []
     for employee in Employees:
         if employee.chi_name:
@@ -44,9 +44,12 @@ def monthSalary(request, month, status):
     context['cheque_needed'] = cheque_needed
     print_record_form = PrintRecordFrom(initial=({'month': month}))
     context['print_record_form'] = print_record_form
+    context['pay_status_list'] = PAY_STATUS_LIST
     if request.method == 'POST':
         print('post')
         action = str(request.POST.get('action')).split('-')
+        print(action)
+        print(action)
         print(action)
         if action[0] == 'print_record_form':
             form = PrintRecordFrom(request.POST)
@@ -77,36 +80,43 @@ def monthSalary(request, month, status):
                 context['print_record_form'] = PrintRecordFrom(request.POST)
                 context['record_form_open']='True'
                 print('error')
-        elif action[0] == 'edit':
-            PID = action[1]
-            try:
-                cheque = validateAndFormatChequeNumber(input)
-            except Exception as e:
-                messages.error(request, str(e))
             
     return render(request, 'MonthSalaries.html', context)
-def validateAndFormatChequeNumber(input):
-    input = input.split('-')
-    if len(input) != 2:
-        return ValueError("Cheque format is incorrect (BOC-123456)")
-    if len(input[1]) !=6:
-        return ValueError("Cheque format is incorrect (BOC-123456)")
-    return input
+    
+def getEmployeeName(employee):
+    if employee.chi_name:
+        name = employee.chi_name
+    else:
+        name = employee.eng_name
+    return name
+    
+
 def getMonthSalary(month, status, description = True, merged=True):
     month_salaries = Salary.objects.filter(month = month).values()
-    if status != 'A':
+    if status == 'All':
+        pass
+    elif status == 'Empty':
+        employees = []
+        for employee in Employee.objects.all():
+            if not month_salaries.filter(employee = employee):
+                SID = employee.SID
+                name = getEmployeeName(employee)
+                employees.append({'SID': SID, 'name': name})
+        return employees
+
+    else:
         month_salaries = month_salaries.filter(pay_status = status).values()
     salaries = []
     if merged:
         for employee in Employee.objects.all():
             pay = month_salaries.filter(employee_id = employee.SID).values('amount', 'description')
-            salary = []
+            salary = {}
             if ( employee.chi_name):
                 name = employee.chi_name
             else:
                 name = employee.eng_name
-            salary.append(employee.SID)
-            salary.append(name)
+            salary['SID'] = employee.SID
+            salary['name'] = name
             if (pay):
                 amount = 0
                 descriptions = ''
@@ -114,9 +124,9 @@ def getMonthSalary(month, status, description = True, merged=True):
                     amount = thispay['amount'] + amount
                     if thispay['description']:
                         descriptions = descriptions +'___' + thispay['description']
-                salary.append(amount)
+                salary['amount'] = amount
                 if description:
-                    salary.append(descriptions.replace('\n', '_'))
+                    salary['description'] = descriptions.replace('\n', '_')
             salaries.append(salary)
             # if (pay):
             #     salaries[employee.SID] = [name, pay[0]['PID'], pay[0]['PID'], pay[0]['PID']]
@@ -126,10 +136,7 @@ def getMonthSalary(month, status, description = True, merged=True):
         salaries = []
         for employee in Employee.objects.all():
             pays = month_salaries.filter(employee_id = employee.SID).values()
-            if employee.chi_name:
-                name = employee.chi_name
-            else:
-                name = employee.eng_name
+            name = getEmployeeName(employee)
             if pays:
                 total = 0
                 details = []
@@ -138,11 +145,12 @@ def getMonthSalary(month, status, description = True, merged=True):
                     total = pay['amount'] + total
                     # pay['SID'] = employee.SID
                     # pay['name'] = name
-                    details.append(pay['pay_status'])
-                    if pay_status[pay['pay_status']]:
-                        pay_status[pay['pay_status']] = pay_status[pay['pay_status']] + 1
+                    status = pay['pay_status'][0]
+                    details.append(status)
+                    if pay_status[status]:
+                        pay_status[status] = pay_status[status] + 1
                     else:
-                        pay_status[pay['pay_status']] = 1
+                        pay_status[status] = 1
                 p = pay_status['P']
                 t = pay_status['N'] + pay_status['M'] + pay_status['P']
                 if t != p:
@@ -157,11 +165,32 @@ def getMonthSalary(month, status, description = True, merged=True):
                 'pay_status': pay_status
             })
             else:
-                salaries.append({
-                    'SID': employee.SID,
-                    'name': name,
-                })
+                if status == "All":
+                    salaries.append({
+                        'SID': employee.SID,
+                        'name': name,
+                    })
     return salaries
+
+def validateAndFormatChequeNumber(input):
+    input = input.split('-')
+    if len(input) != 2:
+        raise ValueError("Cheque format is incorrect (e.g. BOC-123456)")
+    if len(input[1]) !=6:
+        raise ValueError("Cheque format is incorrect (e.g. BOC-123456)")
+    return input
+def validateChequeNumberAndPayStatus(cheque, status):
+    if cheque:
+        cheque = validateAndFormatChequeNumber(cheque)
+    if status not in PAY_STATUS_LIST:
+        raise ValueError(f'Pay Status can only be {PAY_STATUS_LIST}!')
+    if status == 'P':
+        if not cheque:
+            raise SyntaxError("Pay status is P while having no cheque number!")
+    else:
+        if cheque:
+            raise ValueError("Please update Pay Status to P if you already have cheque number!")
+    return cheque
 
 def employeeSalaryInput(request, SID, month):
     context = getContext()
@@ -208,7 +237,8 @@ def employeeSalaryInput(request, SID, month):
                     amount = cleaned['amount']
                     description = cleaned['description']
                     pay_status = cleaned['pay_status']
-                    salary = Salary.objects.create(employee = employee, month = month, amount = amount, description = description, pay_status = pay_status)
+                    cheque_number = cleaned['cheque_number']
+                    salary = Salary.objects.create(employee = employee, month = month, amount = amount, description = description, pay_status = pay_status, cheque_number = cheque_number)
                     messages.success(request, f"New Salary with PID {salary.PID} created.")
                 else:
                     print('error')
@@ -224,6 +254,21 @@ def employeeSalaryInput(request, SID, month):
             salary.delete()
             
             messages.info(request, f"Salary with PID {PID} has been deleted.")
+        elif action[0] == 'edit':
+            print(action)
+            PID = action[1]
+            cheque_number = request.POST.get(f"edit_{PID}_cheque_number")
+            amount = request.POST.get(f"edit_{PID}_amount")
+            description = request.POST.get(f"edit_{PID}_description")
+            pay_status = request.POST.get(f"edit_{PID}_pay_status")
+            print(cheque_number)
+            try:
+                validateChequeNumberAndPayStatus(cheque_number, pay_status)
+                Salary.objects.filter(PID=PID).update(cheque_number= cheque_number, pay_status = pay_status, description = description, amount = amount)
+                messages.success(request, f"Updated Salary #{PID}.")
+            except Exception as e:
+                messages.error(request, str(e))
+            
         
     else:
         print('get')
@@ -260,7 +305,7 @@ def salaryInput(request):
                 #if employee is selected 
                 if (cleaned['new_employee'] == True):
                     messages.add_message(request, messages.SUCCESS, f"New Employee with SID {cleaned['employee'].SID} created.")
-                return redirect(f"/salary_input/{cleaned['employee'].SID}/{month}")
+                return redirect("SalaryInput:employee_salary_input", cleaned['employee'].SID, month)
             else:
                 context['selection_form'] = SelectionForm
                 print('error')
@@ -386,9 +431,6 @@ def exportMonthlySalaryToCSV(request, month, status):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename="Salary-{month}-{datetime.now().strftime("%Y%m%d-%X")}.csv"'
     df = pd.DataFrame(getMonthSalary(month, status, description=True))
-    print(df)
-    df = df.set_axis(["SID", "name", "salary", "description"], axis='columns')
-    print(df)
     df.to_csv(path_or_buf=response, encoding='utf_8_sig', index=False) # type: ignore
     return response
 
@@ -399,6 +441,7 @@ def printRecordPDF(request, month):
         'year': f'20{month[:2]}'
     }
     df = pd.DataFrame(getMonthSalary(month, 'N', description=True))
+    print(df)
     df = df.set_axis(["SID", "name", "amount", "description"], axis='columns')
     data = []
     for _, row in df.iterrows():

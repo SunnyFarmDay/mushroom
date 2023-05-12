@@ -59,14 +59,16 @@
             </div>
         </form>
     </div>
+    {% if Classes %}
     <div class="mt-5">
             <form action="" method="post">
             {% csrf_token %}
             <h1>Class list:</h1>
-            <div class="container-fluid my-3 p-0">
-                <button type="button" class="btn btn-outline-primary m-0" data-bs-toggle="modal" data-bs-target="#confirm_download_classes_csv">Export Classes as .csv</a>
+            <button type="button" class="btn btn-outline-primary m-0" data-bs-dismiss="modal"><a class="" href="{% url 'SalaryInput:export_classes_csv' %}">Export Classes as .csv</a></button>
+            <!-- <div class="container-fluid my-3 p-0">
+                <button type="button" class="btn btn-outline-primary m-0" data-bs-toggle="modal" data-bs-target="#confirm_download_classes_csv">Export Classes as .csv</a> -->
             </div>
-            <div class="modal fade" id="confirm_download_classes_csv" tabindex="-1" aria-labelledby="confirm_download_classes_csv" aria-hidden="true">
+            <!-- <div class="modal fade" id="confirm_download_classes_csv" tabindex="-1" aria-labelledby="confirm_download_classes_csv" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                   <div class="modal-content">
                     <div class="modal-body">
@@ -76,7 +78,7 @@
                     </div>
                   </div>
                 </div>
-            </div>
+            </div> -->
             <table class="container">
                 <thead>
                     <tr class="border-bottom">
@@ -115,6 +117,7 @@
             </table>
         </form>
     </div>
+    {% endif %}
 </div>
 {% endblock %}
 {% block script %}
