@@ -17,8 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
+from django.views.generic import RedirectView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', lambda request: redirect('SalaryInput:home', permanent=True)),
+    path('', RedirectView.as_view(pattern_name='SalaryInput:home', permanent=True)),
+    path('home/', RedirectView.as_view(pattern_name='SalaryInput:home', permanent=True)),
     path('employee/', include('SalaryInput.urls')),
 ]
