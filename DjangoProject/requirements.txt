@@ -12,7 +12,6 @@ numpy==1.24.3
 openpyxl==3.1.2
 pandas==2.0.1
 Pillow==9.5.0
-pkg_resources==0.0.0
 psycopg2==2.9.6
 pycairo==1.23.0
 python-dateutil==2.8.2
