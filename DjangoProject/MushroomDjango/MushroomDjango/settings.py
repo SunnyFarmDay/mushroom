@@ -16,6 +16,7 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+LOGIN_URL = '/login/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -75,7 +76,7 @@ WSGI_APPLICATION = 'MushroomDjango.wsgi.application'
 
 # CSRF TRUSTED
 
-CSRF_TRUSTED_ORIGINS = ['http://homeufo.hopto.org:8199', 'http://114.29.236.172:8099/', 'http://fujipiano.com:8099/']
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8099', 'http://114.29.236.172:8099/', 'http://fujipiano.com:8099/', 'http://www.fujipiano.com:8099/']
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

@@ -2,6 +2,7 @@
 from django.urls import path
 from . import views
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
 
 app_name = "SalaryInput"
 urlpatterns = [
@@ -14,3 +15,6 @@ urlpatterns = [
     path('export_monthly_salary_csv/<int:month>/<str:status>', views.exportMonthlySalaryToCSV, name="export_monthly_salary_csv"),
     path('print_record_pdf/<str:month>', views.printRecordPDF, name='print_record_pdf')
 ]
+
+for url in urlpatterns:
+    url.callback = login_required(url.callback)

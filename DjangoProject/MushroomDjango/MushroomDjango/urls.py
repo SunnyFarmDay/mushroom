@@ -18,10 +18,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
 from django.views.generic import RedirectView
-
+from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(pattern_name='SalaryInput:home', permanent=True)),
     path('home/', RedirectView.as_view(pattern_name='SalaryInput:home', permanent=True)),
     path('employee/', include('SalaryInput.urls')),
+    path('login/', views.login, name="login"),
+    path('logout/', views.logout, name="logout")
 ]

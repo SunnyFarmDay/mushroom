@@ -31,9 +31,16 @@
             </div>
             {% block additional_buttons %}
             {% endblock %}
+            {% if user.is_authenticated %}
+            <a id="salary-add" class="btn btn-outline-danger mx-2" href="{% url 'logout' %}">Logout</a>
+            {% endif %}
         </div>
         
     </nav>
+    <div class="container my-2">
+    {% include 'components/ShowMessages.html' %}
+
+    </div>
       
 {% block body %}
     <h1>Hello World!</h1>
