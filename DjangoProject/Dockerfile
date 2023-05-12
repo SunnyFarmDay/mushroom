@@ -6,7 +6,7 @@ RUN apt-get update
 RUN apt-get install -y tzdata
 RUN echo ${TZ} > /etc/timezone && \
     dpkg-reconfigure -f noninteractive tzdata
-RUN apt-get install -y python3 python3-pip pkg-config libcairo2-dev
+RUN apt-get install -y python3 python3-pip pkg-config libcairo2-dev libpq-dev
 
 RUN python3 -m pip install --upgrade pip
 COPY ./requirements.txt .
