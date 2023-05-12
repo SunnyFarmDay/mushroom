@@ -5,8 +5,15 @@
     "**/.hg": true,
     "**/CVS": true,
     "**/.DS_Store": true,
-    "**/Thumbs.db": true
+    "**/Thumbs.db": true,
+    "ChequePrint/venv": true,
+    "ExcelToSql": true,
+    "DjangoProject/venv": true
   },
-  "hide-files.files": [],
+  "hide-files.files": [
+    "ChequePrint/venv",
+    "ExcelToSql",
+    "DjangoProject/venv"
+  ],
   "python.analysis.typeCheckingMode": "basic"
 }

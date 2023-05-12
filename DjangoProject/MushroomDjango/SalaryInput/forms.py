@@ -53,7 +53,6 @@ class EmployeeSalarySelectionForm(forms.Form):
                     errors.append(forms.ValidationError("Unknown Error01"))
         else:
             name = str(SID_or_name)
-            print(name)
             if len(SID_or_name) < 4:
                 chi_name = name
                 eng_name = ''
@@ -124,7 +123,6 @@ class EmployeeSalarySelectionForm(forms.Form):
 #                     cleaned['employee']=employee
 #         else:
 #             name = str(SID_or_name)
-#             print(name)
 #             if len(SID_or_name) < 4:
 #                 chi_name = name
 #                 eng_name = ''
@@ -169,15 +167,12 @@ class SalaryRecordForm(forms.Form):
         if weight:
             try:
                 weights = str(weight).split('+')
-                print(weights)
                 total = 0
                 for thisweight in weights:
                     total = total + float(thisweight)
-                print(total, float(amount))
                 cleaned['weight'] = ''
                 totalamount = round((total * float(amount)), 2)
                 cleaned['amount'] = totalamount
-                print(round((total * float(amount)), 2))
                 cleaned['description'] = f"{cleaned['description']}\n ({weight})={str(total)}\n*{amount}={totalamount}"
             except Exception as e:
                 raise forms.ValidationError(f'{e}, Weight is incorrectly input.')
@@ -246,7 +241,6 @@ class PrintRecordFrom(forms.Form):
         total_cheque = 0
         for details in cheque_list:
             details = details.strip()
-            print(details)
             details = details.split('-')
             if details[0] not in CHEQUE_TYPE:
                 errors.append(forms.ValidationError(f'Cheque type must be {CHEQUE_TYPE}'))
@@ -255,7 +249,6 @@ class PrintRecordFrom(forms.Form):
                     errors.append(forms.ValidationError(f'Cheque format is wrong'))
                 else:
                     if len(details[1]) != 6 or len(details[2]) != 6:
-                        print(details)
                         errors.append(forms.ValidationError(f'Cheque number format error!'))
                     else:
                         total_cheque = total_cheque + (int(details[2]) - int(details[1])) + 1

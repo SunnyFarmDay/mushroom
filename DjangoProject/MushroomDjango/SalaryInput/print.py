@@ -99,7 +99,6 @@ FORMATTING = {
 
 
 def print_record(date, data):
-    print(len(data))
     # Create a new PDF file
     filename = "cheque_output.pdf"
     if os.path.exists(filename):
@@ -146,7 +145,6 @@ def print_record(date, data):
                     stop = i
                     amount_in_word = [amount_in_word[0][:stop+1], amount_in_word[0][stop+1:]]
                     break
-            print(stop)
 
         
             

@@ -37,7 +37,6 @@ def home(request):
 def monthSalary(request, month, status):
     context = getContext()
     context['month_salaries'] = getMonthSalary(month, status, merged=False)
-    print(getMonthSalary(month, status, merged=False))
     context['month']=month
     context['record_form_open']='False'
     cheque_needed = countSalary(month, 'N')
@@ -46,17 +45,11 @@ def monthSalary(request, month, status):
     context['print_record_form'] = print_record_form
     context['pay_status_list'] = PAY_STATUS_LIST
     if request.method == 'POST':
-        print('post')
         action = str(request.POST.get('action')).split('-')
-        print(action)
-        print(action)
-        print(action)
         if action[0] == 'print_record_form':
             form = PrintRecordFrom(request.POST)
             if form.is_valid():
-                print('valid')
                 cleaned = form.cleaned_data # {'month': 2304, 'cheque_available': 'BOC-100001-100030', 'change_to_printed': True, 'print_time': datetime.date(2023, 5, 7)}
-                print(cleaned)
                 cheques = cleaned['cheque_available']
                 details = str(cheques).split('\r')
                 cheque_available = []
@@ -73,13 +66,11 @@ def monthSalary(request, month, status):
                         if (salaries):
                             for salary in salaries:
                                 Salary.objects.filter(PID = salary.PID).update(paid_time = cleaned['print_time'], pay_status = 'P', cheque_number = f"{cheque_available[count][0]}-{cheque_available[count][1]}")
-                                print(salary, salary.paid_time, salary.pay_status, salary.cheque_number)
                             count = count + 1
                 return printRecord(cheque_available, month, salary_record)
             else:
                 context['print_record_form'] = PrintRecordFrom(request.POST)
                 context['record_form_open']='True'
-                print('error')
             
     return render(request, 'MonthSalaries.html', context)
     
@@ -209,7 +200,6 @@ def employeeSalaryInput(request, SID, month):
     ])
     context['formset'] = formset
     if request.method == 'POST':
-        print('post')
         action = (request.POST.get('action')).split('-')
         if action[0] == 'selection_form':
             SelectionForm = EmployeeSalarySelectionForm(request.POST)
@@ -224,15 +214,11 @@ def employeeSalaryInput(request, SID, month):
                 return redirect(f"/salary_input/{cleaned['employee'].SID}/{month}")
             else:
                 context['selection_form'] = SelectionForm
-                print('error')
         
         elif action[0] == 'add_record':
             formset = SalaryRecordFormSet(request.POST)
-            print('add_record')
-            print(formset.errors)
             for thisform in formset:
                 if thisform.is_valid():
-                    print('valid')
                     cleaned = thisform.cleaned_data
                     amount = cleaned['amount']
                     description = cleaned['description']
@@ -241,12 +227,10 @@ def employeeSalaryInput(request, SID, month):
                     salary = Salary.objects.create(employee = employee, month = month, amount = amount, description = description, pay_status = pay_status, cheque_number = cheque_number)
                     messages.success(request, f"New Salary with PID {salary.PID} created.")
                 else:
-                    print('error')
                     context['formset'] = formset
                     for errors in formset.errors:
                         for key, value in errors.items():
                             for thiserror in value:
-                                print(thiserror)
                                 messages.error(request, f"Input {key}: {thiserror}")
         elif action[0] == 'delete':
             PID = action[1]
@@ -255,13 +239,11 @@ def employeeSalaryInput(request, SID, month):
             
             messages.info(request, f"Salary with PID {PID} has been deleted.")
         elif action[0] == 'edit':
-            print(action)
             PID = action[1]
             cheque_number = request.POST.get(f"edit_{PID}_cheque_number")
             amount = request.POST.get(f"edit_{PID}_amount")
             description = request.POST.get(f"edit_{PID}_description")
             pay_status = request.POST.get(f"edit_{PID}_pay_status")
-            print(cheque_number)
             try:
                 validateChequeNumberAndPayStatus(cheque_number, pay_status)
                 Salary.objects.filter(PID=PID).update(cheque_number= cheque_number, pay_status = pay_status, description = description, amount = amount)
@@ -271,9 +253,8 @@ def employeeSalaryInput(request, SID, month):
             
         
     else:
-        print('get')
+        pass
     records = Salary.objects.filter(employee = employee, month = month).values()
-    print(records)
     total = 0
     for salary in records:
         total = total + salary['amount']
@@ -293,7 +274,6 @@ def salaryInput(request):
     context['Employees_name'] = getEmployeesName()
 
     if request.method == 'POST':
-        print('post')
         action = request.POST['action'].split('-')
         if action[0] == 'selection_form':
             SelectionForm = EmployeeSalarySelectionForm(request.POST)
@@ -308,10 +288,8 @@ def salaryInput(request):
                 return redirect("SalaryInput:employee_salary_input", cleaned['employee'].SID, month)
             else:
                 context['selection_form'] = SelectionForm
-                print('error')
             #get all employee's salary records
     else:
-        print('get')
         SelectionForm = EmployeeSalarySelectionForm(initial={'month': month})
         context['selection_form'] = SelectionForm
     return render(request, "SalaryInput.html", context)
@@ -381,7 +359,6 @@ def classInput(request):
     context['type_list'] = type_list
     context['level_list'] = level_list
     if request.method == 'POST':
-        print(request.POST.get('action'))
         if request.POST['action'] == "class_edit":
             if form.is_valid():
                 newClass = form.save()
@@ -424,7 +401,6 @@ def exportClassesToCSV(request):
     # return response
     df = pd.DataFrame(Class.objects.all().values())
     csv = df.to_csv(path_or_buf=response, index=False) # type: ignore
-    print(csv)
     return response
 
 def exportMonthlySalaryToCSV(request, month, status):
@@ -441,7 +417,6 @@ def printRecordPDF(request, month):
         'year': f'20{month[:2]}'
     }
     df = pd.DataFrame(getMonthSalary(month, 'N', description=True))
-    print(df)
     df = df.set_axis(["SID", "name", "amount", "description"], axis='columns')
     data = []
     for _, row in df.iterrows():

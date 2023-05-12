@@ -124,7 +124,6 @@ def print_check(cheque_type, name, date, amount):
             if (amount_in_word[0][i]) == ' ':
                 stop = i
                 break
-        print(stop)
 
     
         amount_in_word = [amount_in_word[0][:stop], amount_in_word[0][stop+1:]]
