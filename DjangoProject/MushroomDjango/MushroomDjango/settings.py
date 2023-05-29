@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', "django-insecure-775k&^1=e#)*vd^^8bpds^9wx3
 #DEBUG = True
 DEBUG = os.getenv('DEBUG', True)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost', '114.29.236.172', 'fujipiano.com', 'www.fujipiano.com']
 
 
 # Application definition
@@ -76,7 +76,7 @@ WSGI_APPLICATION = 'MushroomDjango.wsgi.application'
 
 # CSRF TRUSTED
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8099', 'http://114.29.236.172:8099/', 'http://fujipiano.com:8099/', 'http://www.fujipiano.com:8099/']
+CSRF_TRUSTED_ORIGINS = ['http://fujipiano.com:8099/', 'http://www.fujipiano.com:8099']
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

@@ -2,15 +2,19 @@ version: '3.8'
 
 services:
   django_gunicorn:
+    restart: always
     volumes:
       - static:/static
     env_file:
       - .env
     build:
       context: .
+    depends_on:
+      - db
     ports:
       - "8098:8098"
   nginx:
+    restart: always
     build:
       ./nginx
     volumes:
@@ -19,8 +23,21 @@ services:
       - "8099:8099"
     depends_on:
       - django_gunicorn
-    
+  db:
+    image: postgres:15.3-alpine
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    ports:
+      - '5432:5432'
+    volumes:
+    - db:/var/lib/postgresql/data
 
 
 volumes:
   static:
+  db:
+    driver: local
