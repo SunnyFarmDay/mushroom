@@ -76,7 +76,7 @@ WSGI_APPLICATION = 'MushroomDjango.wsgi.application'
 
 # CSRF TRUSTED
 
-CSRF_TRUSTED_ORIGINS = ['http://fujipiano.com:8099/', 'http://www.fujipiano.com:8099']
+CSRF_TRUSTED_ORIGINS = ['http://*.fujipiano.com:8099/']
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
