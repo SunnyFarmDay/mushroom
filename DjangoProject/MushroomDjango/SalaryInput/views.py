@@ -118,7 +118,7 @@ def getMonthSalary(month, status, description = True, merged=True):
                 salary['amount'] = amount
                 if description:
                     salary['description'] = descriptions.replace('\n', '_')
-            salaries.append(salary)
+                salaries.append(salary)
             # if (pay):
             #     salaries[employee.SID] = [name, pay[0]['PID'], pay[0]['PID'], pay[0]['PID']]
             # else:
@@ -410,30 +410,32 @@ def exportMonthlySalaryToCSV(request, month, status):
     df.to_csv(path_or_buf=response, encoding='utf_8_sig', index=False) # type: ignore
     return response
 
-def printRecordPDF(request, month):
-    date = {
-        'day': '7',
-        'month': month[2:],
-        'year': f'20{month[:2]}'
-    }
-    df = pd.DataFrame(getMonthSalary(month, 'N', description=True))
-    df = df.set_axis(["SID", "name", "amount", "description"], axis='columns')
-    data = []
-    for _, row in df.iterrows():
-        if row['amount']:
-            row_data = {}
-            row_data['SID'] = row['SID']
-            row_data['name'] = row['name']
-            row_data['amount'] = row['amount']
-            row_data['description'] = row['description']
-            data.append(row_data)
-    file = print_record(date, data)
-    with open(file, 'rb') as f:
-        response = HttpResponse(f.read(), content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="Cheque-BOC-{month}-{datetime.now().strftime("%Y%m%d-%X")}.pdf"'
-    f.close()
-    return response
 
+# def printRecordPDF(request, month):
+#     date = {
+#         'day': '7',
+#         'month': month[2:],
+#         'year': f'20{month[:2]}'
+#     }
+#     df = pd.DataFrame(getMonthSalary(month, 'N', description=True))
+#     df = df.set_axis(["SID", "name", "amount", "description"], axis='columns')
+#     data = []
+#     for _, row in df.iterrows():
+#         if row['amount']:
+#             row_data = {}
+#             row_data['SID'] = row['SID']
+#             row_data['name'] = row['name']
+#             row_data['amount'] = row['amount']
+#             row_data['description'] = row['description']
+#             data.append(row_data)
+#     file = print_record(date, data)
+#     with open(file, 'rb') as f:
+#         response = HttpResponse(f.read(), content_type='application/pdf')
+#         response['Content-Disposition'] = f'attachment; filename="Cheque-{month}-{datetime.now().strftime("%Y%m%d-%X")}.pdf"'
+#     f.close()
+#     return response
+
+#Print the cheque
 def printRecord(cheque_available, month, salary_record):
     date = {
         'day': '7',
@@ -458,7 +460,7 @@ def printRecord(cheque_available, month, salary_record):
     file = print_record(date, data)
     with open(file, 'rb') as f:
         response = HttpResponse(f.read(), content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="Cheque-BOC-{month}-{datetime.now().strftime("%Y%m%d-%X")}.pdf"'
+        response['Content-Disposition'] = f'attachment; filename="Cheque-{month}-{datetime.now().strftime("%Y%m%d-%X")}.pdf"'
     f.close()
     return response
 

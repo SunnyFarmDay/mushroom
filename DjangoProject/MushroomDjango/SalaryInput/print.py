@@ -58,11 +58,6 @@ def amount_to_en(num):
     return words
 
 
-Size = {
-    'BOC': [17.1, 8.9],
-    'HSBC': [15.9, 8.3],
-    'Wage Sheet': [19.2, 10.5]
-}
 pdfmetrics.registerFont(TTFont('TimesNewRoman', 'staticfiles/fonts/MINGLIU.TTC'))
 pdfmetrics.registerFont(TTFont('MingLiu', 'staticfiles/fonts/MINGLIU.TTC'))
 
@@ -90,19 +85,19 @@ FORMATTING = {
         'DATE_YEAR': (13.8, 6.3),
         'NAME': (1.6, 5.5),
         'AMOUNT_0': (11.3, 4.5),
-        'AMOUNT_1': (2.4, 4.5),
-        'AMOUNT_2': (1.9, 3.8),
-        'AMOUNT_OVERFLOW': 999
+        'AMOUNT_1': (2.4, 4.6),
+        'AMOUNT_2': (0.9, 3.8),
+        'AMOUNT_OVERFLOW': 37
     },
     'WAGE':
     {
         'SIZE_W': 19.2,
         'SIZE_H': 10.5,
-        'DATE_MONTH': (3.1, 8.9),
-        'DATE_YEAR': (1.7, 8.9),
-        'SID': (14.3, 9.0),
+        'DATE_MONTH': (3.6, 9.0),
+        'DATE_YEAR': (1.8, 9.0),
+        'SID': (14.3, 8.9),
         'NAME': (3.4, 7.6),
-        'AMOUNT': (9.4, 4.8),
+        'AMOUNT': (9.4, 4.6),
         'CHEQUE_NUM': (3.5, 2.5)
     }
 }
@@ -146,9 +141,10 @@ def print_record(date, data):
         c.setFont('TimesNewRoman', 10)
 
         amount_in_word = [amount_to_en(amount), '']
-        if len(amount_in_word[0]) >= 59:
+        overflow = format['AMOUNT_OVERFLOW']
+        if len(amount_in_word[0]) >= overflow:
             stop = 0
-            for i in range(59, 0, -1):
+            for i in range(overflow, 0, -1):
                 if (amount_in_word[0][i]) == ' ':
                     stop = i
                     amount_in_word = [amount_in_word[0][:stop], amount_in_word[0][stop+1:]]
@@ -183,7 +179,7 @@ def print_record(date, data):
         c.setFont('MingLiu', 16)
         c.drawString(format['AMOUNT'][0] * cm, format['AMOUNT'][1] * cm, f"合共: {thisdata['amount']}")
         
-        c.drawString(format['CHEQUE_NUM'][0] * cm, format['CHEQUE_NUM'][1] * cm, f"支票號碼 #{thisdata['cheque_number']}")
+        c.drawString(format['CHEQUE_NUM'][0] * cm, format['CHEQUE_NUM'][1] * cm, f"支票號碼 #{thisdata['layout']}-{thisdata['cheque_number']}")
 
         c.showPage()
         

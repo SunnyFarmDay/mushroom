@@ -13,7 +13,7 @@ urlpatterns = [
     path('class_input/', views.classInput, name="class_input"),
     path('export_classes_csv', views.exportClassesToCSV, name="export_classes_csv"),
     path('export_monthly_salary_csv/<int:month>/<str:status>', views.exportMonthlySalaryToCSV, name="export_monthly_salary_csv"),
-    path('print_record_pdf/<str:month>', views.printRecordPDF, name='print_record_pdf')
+    # path('print_record_pdf/<str:month>', views.printRecordPDF, name='print_record_pdf')
 ]
 
 for url in urlpatterns:

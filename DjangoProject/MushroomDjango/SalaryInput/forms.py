@@ -161,23 +161,26 @@ class SalaryRecordForm(forms.Form):
     
     def clean(self):
         cleaned = super().clean()
-        weight = cleaned['weight']
-        weight = weight.replace('_', '+')
-        amount = cleaned['amount']
-        if weight:
-            try:
-                weights = str(weight).split('+')
-                total = 0
-                for thisweight in weights:
-                    total = total + float(thisweight)
-                cleaned['weight'] = ''
-                totalamount = round((total * float(amount)), 2)
-                cleaned['amount'] = totalamount
-                cleaned['description'] = f"{cleaned['description']}\n ({weight})={str(total)}\n*{amount}={totalamount}"
-            except Exception as e:
-                raise forms.ValidationError(f'{e}, Weight is incorrectly input.')
         try:
-            validateChequeNumberAndPayStatus(cleaned['cheque_number'], cleaned['pay_status'])
+            weight = cleaned['weight']
+            weight = weight.replace('_', '+')
+            amount = cleaned['amount']
+            if weight:
+                try:
+                    weights = str(weight).split('+')
+                    total = 0
+                    for thisweight in weights:
+                        total = total + float(thisweight)
+                    cleaned['weight'] = ''
+                    totalamount = round((total * float(amount)), 2)
+                    cleaned['amount'] = totalamount
+                    cleaned['description'] = f"{cleaned['description']}\n ({weight})={str(total)}\n*{amount}={totalamount}"
+                except Exception as e:
+                    raise forms.ValidationError(f'{e}, Weight is incorrectly input.')
+            try:
+                validateChequeNumberAndPayStatus(cleaned['cheque_number'], cleaned['pay_status'])
+            except Exception as e:
+                raise forms.ValidationError(e)
         except Exception as e:
             raise forms.ValidationError(e)
         return cleaned
