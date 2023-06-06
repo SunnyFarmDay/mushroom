@@ -35,7 +35,7 @@ class Salary(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.CharField(max_length=3000, blank = True)
     pay_status = models.CharField(max_length=10)
-    cheque_number = models.CharField(max_length=10, blank = True)
+    cheque_number = models.CharField(max_length=12, blank = True)
     created_time = models.DateField(auto_now_add=True)
     paid_time = models.DateField(blank = True, null=True)
 

@@ -422,7 +422,6 @@ def printRecordPDF(request, month):
     for _, row in df.iterrows():
         if row['amount']:
             row_data = {}
-            row_data['layout'] = 'BOC'
             row_data['SID'] = row['SID']
             row_data['name'] = row['name']
             row_data['amount'] = row['amount']

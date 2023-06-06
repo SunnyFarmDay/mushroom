@@ -81,6 +81,19 @@ FORMATTING = {
         'AMOUNT_2': (1.0, 3.2),
         'AMOUNT_OVERFLOW': 48
     },
+    'HSBC':
+    {
+        'SIZE_W': 15.3,
+        'SIZE_H': 8.3,
+        'DATE_DAY': (11.6, 6.3),
+        'DATE_MONTH': (12.6, 6.3),
+        'DATE_YEAR': (13.8, 6.3),
+        'NAME': (1.6, 5.5),
+        'AMOUNT_0': (11.3, 4.5),
+        'AMOUNT_1': (2.4, 4.5),
+        'AMOUNT_2': (1.9, 3.8),
+        'AMOUNT_OVERFLOW': 999
+    },
     'WAGE':
     {
         'SIZE_W': 19.2,
@@ -92,7 +105,6 @@ FORMATTING = {
         'AMOUNT': (9.4, 4.8),
         'CHEQUE_NUM': (3.5, 2.5)
     }
-
 }
 
 
