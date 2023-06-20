@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 from .print import print_record
 from .const import *
+from django.urls import reverse
 # Create your views here.
 
 #Get namelist
@@ -211,7 +212,7 @@ def employeeSalaryInput(request, SID, month):
                 #if employee is selected 
                 if (cleaned['new_employee'] == True):
                     messages.add_message(request, messages.SUCCESS, f"New Employee with SID {cleaned['employee'].SID} created.")
-                return redirect(f"/salary_input/{cleaned['employee'].SID}/{month}")
+                return redirect(reverse('SalaryInput:employee_salary_input', kwargs={'SID': cleaned['employee'].SID, 'month': month}))
             else:
                 context['selection_form'] = SelectionForm
         
