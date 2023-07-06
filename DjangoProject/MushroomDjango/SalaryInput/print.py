@@ -142,7 +142,7 @@ def print_record(date, data):
 
         amount_in_word = [amount_to_en(amount), '']
         overflow = format['AMOUNT_OVERFLOW']
-        if len(amount_in_word[0]) >= overflow:
+        if len(amount_in_word[0]) > overflow :
             stop = 0
             for i in range(overflow, 0, -1):
                 if (amount_in_word[0][i]) == ' ':
