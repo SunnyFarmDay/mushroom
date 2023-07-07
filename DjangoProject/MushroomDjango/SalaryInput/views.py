@@ -188,11 +188,12 @@ def validateChequeNumberAndPayStatus(cheque, status):
     return cheque
 
 def getPaidTotals(salaries):
-    stats = {}
+    stats = {'empty': 0}
     total = 0
     empty_record = False
     for salary in salaries:
         if salary.pay_status == 'P':
+            print(salary.cheque_number, salary.employee, salary.amount)
             total = total + salary.amount
             if salary.cheque_number:
                 if salary.cheque_number.split('-')[0] in stats:
@@ -200,6 +201,7 @@ def getPaidTotals(salaries):
                 else:
                     stats[salary.cheque_number.split('-')[0]] = salary.amount
             else:
+                stats['empty'] = stats['empty']+salary.amount
                 empty_record = True
     stats['total'] = total
     stats['empty_record'] = empty_record

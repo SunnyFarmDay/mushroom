@@ -121,13 +121,16 @@
     {% endfor %} -->
     {% if status == 'All' or status == 'P' %}
     <div class="row">
-        <div class="col-md-3">Total: {{stats.total}}</div>
+        <div class="col-md-2">Total: {{stats.total}}</div>
         {% for key, data in stats.items %}
-        {% if key != 'total' and key != 'empty_record' %}
-        <div class="col-md-3">{{ key }}: {{ data }}</div>
+        {% if key != 'total' and key != 'empty_record' and key != 'empty' %}
+        <div class="col-md-2">{{ key }}: {{ data }}</div>
         {% endif %}
         {% endfor %}
-        <div class="col-md-3">Empty Record: {{stats.empty_record}}</div>
+        <div class="col-md-2">Empty Record: {{stats.empty_record}}</div>
+        {% if stats.empty %}
+        <div class="col-md-2">Empty Total: {{stats.empty}}</div>
+        {% endif %}
     </div>
     {% endif %}
 </div>
