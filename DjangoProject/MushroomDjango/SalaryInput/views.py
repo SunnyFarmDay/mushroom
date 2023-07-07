@@ -39,12 +39,15 @@ def monthSalary(request, month, status):
     context = getContext()
     context['month_salaries'] = getMonthSalary(month, status, merged=False)
     context['month']=month
+    context['status'] = status
     context['record_form_open']='False'
     cheque_needed = countSalary(month, 'N')
     context['cheque_needed'] = cheque_needed
     print_record_form = PrintRecordFrom(initial=({'month': month}))
     context['print_record_form'] = print_record_form
     context['pay_status_list'] = PAY_STATUS_LIST
+    if status == 'All' or 'P':
+        context['stats'] = getPaidTotals(Salary.objects.filter(month = month))
     if request.method == 'POST':
         action = str(request.POST.get('action')).split('-')
         if action[0] == 'print_record_form':
@@ -183,6 +186,24 @@ def validateChequeNumberAndPayStatus(cheque, status):
         if cheque:
             raise ValueError("Please update Pay Status to P if you already have cheque number!")
     return cheque
+
+def getPaidTotals(salaries):
+    stats = {}
+    total = 0
+    empty_record = False
+    for salary in salaries:
+        if salary.pay_status == 'P':
+            total = total + salary.amount
+            if salary.cheque_number:
+                if salary.cheque_number.split('-')[0] in stats:
+                    stats[salary.cheque_number.split('-')[0]] = stats[salary.cheque_number.split('-')[0]] + salary.amount
+                else:
+                    stats[salary.cheque_number.split('-')[0]] = salary.amount
+            else:
+                empty_record = True
+    stats['total'] = total
+    stats['empty_record'] = empty_record
+    return stats
 
 def employeeSalaryInput(request, SID, month):
     context = getContext()
