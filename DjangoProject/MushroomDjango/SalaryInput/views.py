@@ -290,8 +290,11 @@ def employeeSalaryInput(request, SID, month):
 
 
 def salaryInput(request):
-
-    month = str(int(datetime.now().strftime("%Y%m")[2:]) - 1) #temp solution for changing month to previous
+    # get the month that is previous to current month in the format of YYMM
+    month = str((datetime.now().year-2000)*100 + datetime.now().month-1)
+    if (month[2:] == '00'):
+        month = str(int(month)-88)
+    
     context = getContext()
 
     #Add datalist for Employees' name choices
@@ -320,10 +323,6 @@ def salaryInput(request):
 
 ### old
 # def salaryInput(request):
-#     if ('month' in request.GET):
-#         month = request.GET.get('month')
-#     else:
-#         month = str(int(datetime.now().strftime("%Y%m")[2:]) - 1) #temp solution for changing month to previous
 #     print(month)
 #     context = getContext()
 #     context['month'] = month
