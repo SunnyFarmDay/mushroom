@@ -107,27 +107,25 @@
             </tr>
             {% endif %}
             <form action="" method="post">
-            {{ formset.management_form }}
             {% csrf_token %}
-            {% for thisform in formset %}
-                {% for hidden in thisform.hidden_fields %}
+                {% for hidden in salary_record_form.hidden_fields %}
                 {{ hidden }}
                 {% endfor %}
                 <tr class="record_forms">
                     <th scope="row" class="text-muted fw-medium">Input</th>
-                    <td>{{ thisform.amount }}</div></td>
-                    <td><div class="input-group">{{ thisform.hourly_rate }}{{ thisform.duration }}</div></td>
-                    <td>{{ thisform.description }}</td>
-                    <td class="duration_td_field">{{ thisform.pay_status }}</td>
-                    <td>{{ thisform.cheque_number    }}</td>
+                    <td>{{ salary_record_form.amount }}</div></td>
+                    <td><div class="input-group">{{ salary_record_form.hourly_rate }}{{ salary_record_form.duration }}</div></td>
+                    <td>{{ salary_record_form.description }}</td>
+                    <td class="duration_td_field">{{ salary_record_form.pay_status }}</td>
+                    <td>{{ salary_record_form.cheque_number    }}</td>
                     <td><button type="submit" name="action" value="add_record" class="btn btn-outline-success">Add</button></td>
                     <td></td>
                 </tr>
-            {% endfor %}
             <span id="forms_end"></span>
             </form>
             </tbody>
         </table>
+        {% if employee_hourly_rates_str %}<p><i><bold>Past Hourly Rate: </bold> {{ employee_hourly_rates_str }} </i></p>{% endif %}
     </div>
     
 

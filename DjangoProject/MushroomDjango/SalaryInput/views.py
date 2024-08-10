@@ -218,11 +218,15 @@ def employeeSalaryInput(request, SID, month):
     context['selection_form'] = SelectionForm
     context['Employees_name'] = getEmployeesName()
     #generate the record creation form
-    SalaryRecordFormSet = formset_factory(SalaryRecordForm, extra=0)
-    formset = SalaryRecordFormSet(initial =[
+    salary_record_form = SalaryRecordForm(initial =
         {'pay_status': 'N', 'month': month}
-    ])
-    context['formset'] = formset
+    )
+    for field in salary_record_form.fields:
+        salary_record_form.fields[field].widget.attrs['autocomplete'] = f"{field}_{employee.SID}"
+        # messages.success(request, str(salary_record_form.fields[field].autocomplete))
+    print(salary_record_form)
+    context['salary_record_form'] = salary_record_form
+    context['employee_hourly_rates_str'] = employee.hourly_rate
     
     if employee.hourly_rate:
         context['employee_hourly_rates'] = str(employee.hourly_rate).split(', ')[::-1]
@@ -245,42 +249,41 @@ def employeeSalaryInput(request, SID, month):
                 context['selection_form'] = SelectionForm
         
         elif action[0] == 'add_record':
-            formset = SalaryRecordFormSet(request.POST)
-            for thisform in formset:
-                if thisform.is_valid():
-                    cleaned = thisform.cleaned_data
-                    amount = cleaned['amount']
-                    description = cleaned['description']
-                    pay_status = cleaned['pay_status']
-                    cheque_number = cleaned['cheque_number']
-                    hourly_rate = cleaned['hourly_rate']
-                    if hourly_rate:
-                        if employee.hourly_rate:
-                            hourly_rate_list = str(employee.hourly_rate).split(', ')
-                            if str(hourly_rate) not in hourly_rate_list:
-                                if len(hourly_rate_list) >= 8:
-                                    employee.hourly_rate = str(employee.hourly_rate)[len(str(hourly_rate_list[0]))+2:]
-                                employee.hourly_rate += f", {hourly_rate}"
-                        else:
-                            employee.hourly_rate = hourly_rate
-                        try:
-                            employee.save()
-                            context['employee_hourly_rates'] = employee.hourly_rate
-                        except Exception as e:
-                            messages.error(request, f"{e}: couldn't save employee hourly rate")
-                            
-                        if employee.hourly_rate:
-                            context['employee_hourly_rates'] = str(employee.hourly_rate).split(', ')[::-1]
-                        else:
-                            context['employee_hourly_rates'] = []
-                    salary = Salary.objects.create(employee = employee, month = month, amount = amount, description = description, pay_status = pay_status, cheque_number = cheque_number)
-                    messages.success(request, f"New Salary with PID {salary.PID} created.")
-                else:
-                    context['formset'] = formset
-                    for errors in formset.errors:
-                        for key, value in errors.items():
-                            for thiserror in value:
-                                messages.error(request, f"Input {key}: {thiserror}")
+            salary_record_form = SalaryRecordForm(request.POST)
+            if salary_record_form.is_valid():
+                cleaned = salary_record_form.cleaned_data
+                amount = cleaned['amount']
+                description = cleaned['description']
+                pay_status = cleaned['pay_status']
+                cheque_number = cleaned['cheque_number']
+                hourly_rate = cleaned['hourly_rate']
+                if hourly_rate:
+                    if employee.hourly_rate:
+                        hourly_rate_list = str(employee.hourly_rate).split(', ')
+                        if str(hourly_rate) not in hourly_rate_list:
+                            if len(hourly_rate_list) >= 8:
+                                employee.hourly_rate = str(employee.hourly_rate)[len(str(hourly_rate_list[0]))+2:]
+                            employee.hourly_rate += f", {hourly_rate}"
+                    else:
+                        employee.hourly_rate = hourly_rate
+                    try:
+                        employee.save()
+                        context['employee_hourly_rates'] = employee.hourly_rate
+                    except Exception as e:
+                        messages.error(request, f"{e}: couldn't save employee hourly rate")
+                        
+                    context['employee_hourly_rates_str'] = employee.hourly_rate
+                    if employee.hourly_rate:
+                        context['employee_hourly_rates'] = str(employee.hourly_rate).split(', ')[::-1]
+                    else:
+                        context['employee_hourly_rates'] = []
+                salary = Salary.objects.create(employee = employee, month = month, amount = amount, description = description, pay_status = pay_status, cheque_number = cheque_number)
+                messages.success(request, f"New Salary with PID {salary.PID} created.")
+            else:
+                context['salary_record_form'] = salary_record_form
+                for key, value in salary_record_form.errors.items():
+                    for thiserror in value:
+                        messages.error(request, f"Input {key}: {thiserror}")
         elif action[0] == 'delete':
             PID = action[1]
             salary = Salary.objects.get(PID=PID)
