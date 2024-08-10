@@ -28,7 +28,7 @@ def getContext():
     months = []
     for month in Salary.objects.values('month').distinct():
         months.append(month['month'])
-    context["salary_months"] = months
+    context["salary_months"] = months[::-1]
     return context
 
 def home(request):

@@ -30,7 +30,7 @@ def validateChequeNumberAndPayStatus(cheque, status):
 class EmployeeSalarySelectionForm(forms.Form):
 
     month = forms.IntegerField(widget=forms.NumberInput(attrs={'placeholder': 'YYMM', 'class': "form-control text-end"}))
-    SID_or_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'autocomplete': "on", 'placeholder': 'SID or Name', 'class': "form-control text-end", 'list': 'Employee_names_list','aria-label':"SID_or_name", 'aria-describedby':"SID_or_name"}))
+    SID_or_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'placeholder': 'SID or Name', 'class': "form-control text-end", 'list': 'Employee_names_list','aria-label':"SID_or_name", 'aria-describedby':"SID_or_name"}))
     employee = forms.ModelChoiceField(Employee.objects.all(), required=False)
     new_employee = forms.BooleanField(required=False, initial=False)
 
@@ -155,7 +155,7 @@ class SalaryRecordForm(forms.Form):
         ('P', 'P'),
     )
     amount = forms.DecimalField(max_digits=10, decimal_places=2, required=False, widget=forms.TextInput(attrs={'class': "form-control border-0 record_amount_field", 'placeholder': "Amount?", 'autofocus':'', 'onfocus':"this.select()"}))
-    hourly_rate = forms.DecimalField(max_digits=10, required=False, decimal_places=2, widget=forms.TextInput(attrs={'autocomplete': "on", 'list': "employee_hourly_rates", 'class': "form-control border-0 record_hourly_rate_field", 'placeholder': "Hourly Rate?"}))
+    hourly_rate = forms.DecimalField(max_digits=10, required=False, decimal_places=2, widget=forms.TextInput(attrs={'list': "employee_hourly_rates", 'class': "form-control border-0 record_hourly_rate_field", 'placeholder': "Hourly Rate?"}))
     duration = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': "form-control border-0 record_weight_field", 'placeholder': "X duration"}))
     description = forms.CharField(max_length=3000, required=False,widget=forms.Textarea(attrs={'class': "form-control border-0 textarea description_field", 'placeholder': "Desc?"}))
     pay_status = forms.CharField(max_length=10, widget=forms.TextInput(attrs={'class': "form-control border-0 pay_status_field", 'list': 'pay_status_list'}))
