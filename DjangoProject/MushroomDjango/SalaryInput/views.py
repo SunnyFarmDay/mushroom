@@ -225,7 +225,7 @@ def employeeSalaryInput(request, SID, month):
     context['formset'] = formset
     
     if employee.hourly_rate:
-        context['employee_hourly_rates'] = employee.hourly_rate.split(', ')[::-1]
+        context['employee_hourly_rates'] = str(employee.hourly_rate).split(', ')[::-1]
     else:
         context['employee_hourly_rates'] = []
     if request.method == 'POST':
@@ -270,7 +270,7 @@ def employeeSalaryInput(request, SID, month):
                             messages.error(request, f"{e}: couldn't save employee hourly rate")
                             
                         if employee.hourly_rate:
-                            context['employee_hourly_rates'] = employee.hourly_rate.split(', ')[::-1]
+                            context['employee_hourly_rates'] = str(employee.hourly_rate).split(', ')[::-1]
                         else:
                             context['employee_hourly_rates'] = []
                     salary = Salary.objects.create(employee = employee, month = month, amount = amount, description = description, pay_status = pay_status, cheque_number = cheque_number)
