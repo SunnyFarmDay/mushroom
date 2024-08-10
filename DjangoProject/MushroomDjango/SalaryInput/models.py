@@ -19,6 +19,7 @@ class Employee(models.Model):
     chi_name = models.CharField(max_length=8, blank = True)
     eng_name = models.CharField(max_length=30, blank = True)
     classes = models.ManyToManyField(Class, default=None, blank=True)
+    hourly_rate = models.TextField(blank=True, null=True)
     class Meta:
         ordering = ['SID', 'chi_name']
 
@@ -28,6 +29,7 @@ class Employee(models.Model):
         else:
             name = self.eng_name
         return name
+    
 class Salary(models.Model):
     PID = models.CharField(max_length=11, primary_key=True, default="", editable=False)
     month = models.CharField(max_length=4)

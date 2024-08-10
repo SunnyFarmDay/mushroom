@@ -3,6 +3,7 @@ from .models import Employee, Class, Salary
 from datetime import datetime
 from django.utils import timezone
 from .const import *
+import re
 thismonth = str(int(datetime.now().strftime("%Y%m")[2:]) - 1)
 
 def validateAndFormatChequeNumber(input):
@@ -29,7 +30,7 @@ def validateChequeNumberAndPayStatus(cheque, status):
 class EmployeeSalarySelectionForm(forms.Form):
 
     month = forms.IntegerField(widget=forms.NumberInput(attrs={'placeholder': 'YYMM', 'class': "form-control text-end"}))
-    SID_or_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'placeholder': 'SID or Name', 'class': "form-control text-end", 'list': 'Employee_names_list','aria-label':"SID_or_name", 'aria-describedby':"SID_or_name"}))
+    SID_or_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'autocomplete': "on", 'placeholder': 'SID or Name', 'class': "form-control text-end", 'list': 'Employee_names_list','aria-label':"SID_or_name", 'aria-describedby':"SID_or_name"}))
     employee = forms.ModelChoiceField(Employee.objects.all(), required=False)
     new_employee = forms.BooleanField(required=False, initial=False)
 
@@ -153,8 +154,9 @@ class SalaryRecordForm(forms.Form):
         ('M', 'M'),
         ('P', 'P'),
     )
-    amount = forms.DecimalField(max_digits=10, decimal_places=2, widget=forms.TextInput(attrs={'required': '', 'class': "form-control border-0 record_amount_field", 'placeholder': "Amount?", 'autofocus':'', 'onfocus':"this.select()"}))
-    weight = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': "form-control border-0 record_weight_field", 'placeholder': "X duration"}))
+    amount = forms.DecimalField(max_digits=10, decimal_places=2, required=False, widget=forms.TextInput(attrs={'class': "form-control border-0 record_amount_field", 'placeholder': "Amount?", 'autofocus':'', 'onfocus':"this.select()"}))
+    hourly_rate = forms.DecimalField(max_digits=10, required=False, decimal_places=2, widget=forms.TextInput(attrs={'autocomplete': "on", 'list': "employee_hourly_rates", 'class': "form-control border-0 record_hourly_rate_field", 'placeholder': "Hourly Rate?"}))
+    duration = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': "form-control border-0 record_weight_field", 'placeholder': "X duration"}))
     description = forms.CharField(max_length=3000, required=False,widget=forms.Textarea(attrs={'class': "form-control border-0 textarea description_field", 'placeholder': "Desc?"}))
     pay_status = forms.CharField(max_length=10, widget=forms.TextInput(attrs={'class': "form-control border-0 pay_status_field", 'list': 'pay_status_list'}))
     cheque_number = forms.CharField(max_length=15, required=False, widget=forms.TextInput(attrs={'class': "form-control border-0 cheque_number_field", 'placeholder': 'Cheque Number?'}))
@@ -162,21 +164,33 @@ class SalaryRecordForm(forms.Form):
     def clean(self):
         cleaned = super().clean()
         try:
-            weight = cleaned['weight']
-            weight = weight.replace('_', '+')
+            duration = cleaned['duration']
+            duration = duration.replace('_', '+')
             amount = cleaned['amount']
-            if weight:
-                try:
-                    weights = str(weight).split('+')
-                    total = 0
-                    for thisweight in weights:
-                        total = total + float(thisweight)
-                    cleaned['weight'] = ''
-                    totalamount = round((total * float(amount)), 2)
-                    cleaned['amount'] = totalamount
-                    cleaned['description'] = f"{cleaned['description']}\n ({weight})={str(total)}\n*{amount}={totalamount}"
-                except Exception as e:
-                    raise forms.ValidationError(f'{e}, Weight is incorrectly input.')
+            hourly_rate = str(cleaned['hourly_rate'])
+            if amount and (hourly_rate or duration):
+                raise forms.ValidationError("Only allow either amount or hourly * duration")
+            if not amount:
+                if hourly_rate:
+                    if not re.match(r'^\d+(\.\d+)?$', hourly_rate):
+                        raise forms.ValidationError("Hourly Rate can only be numbers")
+                else:
+                    raise forms.ValidationError("You must enter either amount or hourly * duration")
+                if duration:
+                    try:
+                        duration_list = str(duration).split('+')
+                        total_duration = 0
+                        print(duration_list)
+                        for thisduration in duration_list:
+                            total_duration = total_duration + float(thisduration)
+                        cleaned['duration'] = ''
+                        totalamount = round((total_duration * float(hourly_rate)), 2)
+                        cleaned['amount'] = totalamount
+                        cleaned['description'] = f"{cleaned['description']}\n (Worked {duration}) = {str(total_duration)} hours\nWorked {str(total_duration)} * ${hourly_rate} = Total ${totalamount}"
+                    except Exception as e:
+                        raise forms.ValidationError(f'{e}, Duration is incorrectly input.')
+                else:
+                    raise forms.ValidationError(f'You must enter either amount or hourly * duration')
             try:
                 validateChequeNumberAndPayStatus(cleaned['cheque_number'], cleaned['pay_status'])
             except Exception as e:

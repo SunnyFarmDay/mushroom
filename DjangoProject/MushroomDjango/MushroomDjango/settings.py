@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', "django-insecure-775k&^1=e#)*vd^^8bpds^9wx3
 #DEBUG = True
 DEBUG = os.getenv('DEBUG', True)
 
-ALLOWED_HOSTS = ['localhost', '114.29.236.172', 'fujipiano.com', 'www.fujipiano.com']
+ALLOWED_HOSTS = ['192.168.1.155', 'localhost', '114.29.236.172', 'fujipiano.com', 'www.fujipiano.com']
 
 
 # Application definition
@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'SalaryInput'
-]
+]   
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -9,6 +9,11 @@
     <option>{{ thisname }}</option>
     {% endfor %}
 </datalist>
+<datalist id="employee_hourly_rates">
+    {% for hourly_rate in employee_hourly_rates %}
+    <option>{{ hourly_rate }}</option>
+    {% endfor %}
+</datalist>
 <datalist id="pay_status_list">
     <option>N</option>
     <option>M</option>
@@ -23,7 +28,8 @@
             <thead class="text-center">
                 <tr class="border-bottom">
                 <th>PID</th>
-                <th>Amount (X Duration)</th>
+                <th>Amount</th>
+                <th>(Hourly X Duration)</th>
                 <th>Description</th>
                 <th>Pay Status</th>
                 <th>Cheque Number</th>
@@ -41,6 +47,7 @@
                 <td></td>
                 <td></td>
                 <td></td>
+                <td></td>
             </tr>
             {% endif %}
             {% for record in SalaryRecords %}
@@ -49,6 +56,7 @@
                 <tr>
                 <th scope="row" class="fw-medium">{{ record.PID|slice:"5:" }}</th>
                 <td><input id="edit_{{record.PID}}_amount" type="number" step=".01" min="0" class="form-control border-0 amount_field" name="edit_{{record.PID}}_amount" value="{{ record.amount }}" readonly></td>
+                <td></td>
                 <td><textarea id="edit_{{record.PID}}_description" class="form-control border-0 textarea description_field" name="edit_{{record.PID}}_description" readonly>{{ record.description }}</textarea></td>
                 <td><input type="text" name="edit_{{record.PID}}_pay_status" id="edit_{{record.PID}}_pay_status" class="form-control border-0 pay_status_field" value="{{record.pay_status}}" readonly></td>
                 <td><input type="text" name="edit_{{record.PID}}_cheque_number" id="edit_{{record.PID}}_cheque_number" class="form-control border-0 cheque_number_field" value="{{record.cheque_number}}" readonly></td>
@@ -107,7 +115,8 @@
                 {% endfor %}
                 <tr class="record_forms">
                     <th scope="row" class="text-muted fw-medium">Input</th>
-                    <td><div class="input-group">{{ thisform.amount }}{{ thisform.weight }}</div></td>
+                    <td>{{ thisform.amount }}</div></td>
+                    <td><div class="input-group">{{ thisform.hourly_rate }}{{ thisform.duration }}</div></td>
                     <td>{{ thisform.description }}</td>
                     <td class="duration_td_field">{{ thisform.pay_status }}</td>
                     <td>{{ thisform.cheque_number    }}</td>
