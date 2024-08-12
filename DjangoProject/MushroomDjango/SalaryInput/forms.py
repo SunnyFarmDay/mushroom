@@ -167,10 +167,11 @@ class SalaryRecordForm(forms.Form):
             duration = cleaned['duration']
             duration = duration.replace('_', '+')
             amount = cleaned['amount']
-            hourly_rate = str(cleaned['hourly_rate'])
+            hourly_rate = cleaned['hourly_rate']
             if amount and (hourly_rate or duration):
-                raise forms.ValidationError("Only allow either amount or hourly * duration")
+                raise forms.ValidationError(f"Only allow either amount or hourly * duration ({amount}, {hourly_rate}, {duration}")
             if not amount:
+                hourly_rate = str(hourly_rate)
                 if hourly_rate:
                     if not re.match(r'^\d+(\.\d+)?$', hourly_rate):
                         raise forms.ValidationError("Hourly Rate can only be numbers")
