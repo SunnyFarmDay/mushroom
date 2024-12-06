@@ -89,17 +89,31 @@ FORMATTING = {
         'AMOUNT_2': (0.9, 3.8),
         'AMOUNT_OVERFLOW': 37
     },
+    # 'WAGE':
+    # {
+    #     'SIZE_W': 19.2,
+    #     'SIZE_H': 10.5,
+    #     'DATE_MONTH': (3.6, 9.0),
+    #     'DATE_YEAR': (1.8, 9.0),
+    #     'WAGE': (9.0, 9.0),
+    #     'SID': (14.3, 8.9),
+    #     'NAME': (3.4, 7.6),
+    #     'AMOUNT': (9.4, 4.6),
+    #     'CHEQUE_NUM': (3.5, 2.5),
+    #     'SIGN_HERE': (10.0, 1.5)
+    # },    
     'WAGE':
     {
         'SIZE_W': 19.2,
         'SIZE_H': 10.5,
         'DATE_MONTH': (3.6, 9.0),
         'DATE_YEAR': (1.8, 9.0),
+        'WAGE': (9.0, 9.0),
         'SID': (14.3, 8.9),
-        'NAME': (3.4, 7.6),
-        'AMOUNT': (9.4, 4.6),
-        'CHEQUE_NUM': (3.5, 2.5),
-        'SIGN_HERE': (12.0, 1.2)
+        'NAME': (3.6, 7.6),
+        'AMOUNT': (10.0, 6.0),
+        'CHEQUE_NUM': (3.5, 4.0),
+        'SIGN_HERE': (10.0, 2.5)
     }
 }
 
@@ -167,6 +181,8 @@ def print_record(date, data):
         c.setPageSize((format['SIZE_W'] * cm, format['SIZE_H'] * cm))
         c.drawString(format['DATE_YEAR'][0] * cm, format['DATE_YEAR'][1] * cm, date['year'])
         c.drawString(format['DATE_MONTH'][0] * cm, format['DATE_MONTH'][1] * cm, date['month'])
+
+        c.drawString(format['WAGE'][0] * cm, format['WAGE'][1] * cm, "薪金表")
 
         c.drawString(format['SID'][0] * cm, format['SID'][1] * cm, thisdata['SID'])
         
