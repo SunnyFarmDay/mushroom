@@ -199,7 +199,7 @@ def print_record(date, data):
         c.drawString(format['CHEQUE_NUM'][0] * cm, format['CHEQUE_NUM'][1] * cm, f"支票號碼 #{thisdata['layout']}-{thisdata['cheque_number']}")
 
         c.setFont('TimesNewRoman', 20)
-        c.drawString(format['SIGN_HERE'][0] * cm, format['SIGN_HERE'][1] * cm, "*簽名:____________*")
+        c.drawString(format['SIGN_HERE'][0] * cm, format['SIGN_HERE'][1] * cm, "*簽收:____________*")
 
         c.showPage()
         
