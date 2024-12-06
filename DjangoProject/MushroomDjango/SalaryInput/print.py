@@ -98,7 +98,8 @@ FORMATTING = {
         'SID': (14.3, 8.9),
         'NAME': (3.4, 7.6),
         'AMOUNT': (9.4, 4.6),
-        'CHEQUE_NUM': (3.5, 2.5)
+        'CHEQUE_NUM': (3.5, 2.5),
+        'SIGN_HERE': (10.0, 2.5)
     }
 }
 
@@ -180,6 +181,8 @@ def print_record(date, data):
         c.drawString(format['AMOUNT'][0] * cm, format['AMOUNT'][1] * cm, f"合共: {thisdata['amount']}")
         
         c.drawString(format['CHEQUE_NUM'][0] * cm, format['CHEQUE_NUM'][1] * cm, f"支票號碼 #{thisdata['layout']}-{thisdata['cheque_number']}")
+
+        c.drawString(format['SIGN_HERE'][0] * cm, format['SIGN_HERE'][1] * cm, "簽名:")
 
         c.showPage()
         
