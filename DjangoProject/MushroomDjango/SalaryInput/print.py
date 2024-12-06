@@ -108,7 +108,7 @@ FORMATTING = {
         'SIZE_H': 10.5,
         'DATE_MONTH': (3.6, 9.0),
         'DATE_YEAR': (1.8, 9.0),
-        'WAGE': (9.0, 9.0),
+        'WAGE': (8.0, 9.0),
         'SID': (14.3, 9.0),
         'NAME': (1.8, 7.6),
         'AMOUNT': (10.0, 6.0),
@@ -179,10 +179,10 @@ def print_record(date, data):
         format = FORMATTING['WAGE']
         c.setFont('TimesNewRoman', 16)
         c.setPageSize((format['SIZE_W'] * cm, format['SIZE_H'] * cm))
-        c.drawString(format['DATE_YEAR'][0] * cm, format['DATE_YEAR'][1] * cm, date['year'])
-        c.drawString(format['DATE_MONTH'][0] * cm, format['DATE_MONTH'][1] * cm, date['month'])
+        c.drawString(format['DATE_YEAR'][0] * cm, format['DATE_YEAR'][1] * cm, f"{date['year']}年")
+        c.drawString(format['DATE_MONTH'][0] * cm, format['DATE_MONTH'][1] * cm, f"{date['month']}月")
 
-        c.drawString(format['WAGE'][0] * cm, format['WAGE'][1] * cm, "薪金表")
+        c.drawString(format['WAGE'][0] * cm, format['WAGE'][1] * cm, "本月拆帳額")
 
         c.drawString(format['SID'][0] * cm, format['SID'][1] * cm, thisdata['SID'])
         
